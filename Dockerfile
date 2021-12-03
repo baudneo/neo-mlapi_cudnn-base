@@ -276,11 +276,8 @@ RUN set -x \
     && usermod -o -u 911 www-data
 # Create plugdev user/group for TPU and add www-data to its group (add plugdev to www-data?)
 RUN set -x \
-    && useradd -MU -r -u 901 plugdev \
     && groupmod -o -g 901 plugdev \
-    && usermod -o -u 901 plugdev \
     && usermod -aG plugdev www-data #\
-#    && usermod -aG www-data plugdev
 
 
 RUN set -x && \
