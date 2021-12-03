@@ -268,7 +268,7 @@ RUN set -x \
     && usermod -aG plugdev www-data
 
 # neo-pyzm
-RUN   set -x \
+RUN   set -x && \
       python3 -m pip install git+https://github.com/baudneo/pyzm.git && \
       mkdir /mlapi && cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && ls -alh && \
       git checkout ${MLAPI_VERSION} && \
@@ -277,14 +277,14 @@ RUN   set -x \
       cp /mlapi/mlapi_dbuser.py /config && \
       cp /mlapi/mlapi_face_train.py /config && \
       cp /mlapi/get_encryption_key.py /config && \
-      cp /mlapi/images/ /config && \
-      cp /mlapi/known_faces/ /config && \
-      cp /mlapi/unknown_faces/ /config && \
-      cp /mlapi/tools/ /config && \
-      cp /mlapi/logs/ /config && \
-      cp /mlapi/db/ /config && \
-      cp /mlapi/examples/ /config && \
-      cp /mlapi/tools/ /config && \
+      cp -r /mlapi/images/ /config && \
+      cp -r /mlapi/known_faces/ /config && \
+      cp -r /mlapi/unknown_faces/ /config && \
+      cp -r /mlapi/tools/ /config && \
+      cp -r /mlapi/logs/ /config && \
+      cp -r /mlapi/db/ /config && \
+      cp -r /mlapi/examples/ /config && \
+      cp -r /mlapi/tools/ /config && \
       cp /mlapi/get_models.sh /config && \
       cp /mlapi/mlapiconfig.yml /config && \
       cp /mlapi/mlapisecrets.yml /config
