@@ -313,7 +313,13 @@ RUN set -x \
     INSTALL_CORAL_EDGETPU=yes \
     /config/get_models.sh &&\
     rm -rf /root/.cache/pip
-RUN apt-get remove --purge {deps} && \
+RUN apt-get remove --purge   build-essential \
+    checkinstall \
+    cmake \
+    g++ \
+    gcc \
+    pkg-config \
+    protobuf-compiler && \
     apt-get autoremove --purge && \
     apt-get autoclean
 # Install s6 overlay
