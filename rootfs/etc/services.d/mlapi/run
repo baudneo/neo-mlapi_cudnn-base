@@ -14,9 +14,6 @@ if [ "${MLAPI_DEBUG_ENABLED}" -eq 1 ]; then
   MLAPI_FLAGS="${MLAPI_FLAGS} --debug"
 fi
 
-echo "Waiting for Neo MLAPI to start" | info
-/bin/s6-svwait -U /var/run/s6/services/mlapi
-
 echo "Starting Neo MLAPI..." | info
 s6-setuidgid www-data python3 -m /mlapi/mlapi.py \
     ${MLAPI_FLAGS}
@@ -24,12 +21,3 @@ s6-setuidgid www-data python3 -m /mlapi/mlapi.py \
 echo "Neo MLAPI is up! Proceeding to monitoring." | info
 # Notify s6 service is up
 fdmove 1 3 printf "done\n"
-
-# Need to sleep to act like service is running
-# Terminate container if zm dies
-until [ "$(pgrep -fc /python3 -m /mlapi/mlapi.py ${MLAPI_FLAGS})" -lt "1" ]; do
-  sleep 1
-done
-echo "Neo MLAPI has crashed! Exiting..." | error
-# This is required or the container stop hangs
-s6-svscanctl -t /var/run/s6/services

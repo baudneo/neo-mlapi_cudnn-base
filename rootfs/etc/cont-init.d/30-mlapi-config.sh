@@ -3,8 +3,8 @@
 . "/usr/local/bin/logger"
 program_name="mlapi-config"
 
-if [ ! -f /config/mlapiconfig.yml ]; then
-    logger -s "INFO: ${program_name}: /config/mlapiconfig.yml not found, creating..."
+if [ ! -f /config/mlapi_dbuser.py ]; then
+    logger -s "INFO: ${program_name}: /config/mlapi_dbuser.py not found, creating..."
       s6-setuidgid www-data cp /mlapi/mlapi_dbuser.py /config
   s6-setuidgid www-data cp /mlapi/mlapi_face_train.py /config
   s6-setuidgid www-data cp /mlapi/get_encryption_key.py /config

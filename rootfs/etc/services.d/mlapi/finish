@@ -4,5 +4,5 @@
 # ==============================================================================
 # Neo MLAPI
 # ==============================================================================
-pkill -2 -f "/python3 -m /mlapi/mlapi.py --config /config/mlapi/mlapiconfig.yml"
+pkill -2 -f "/python3 -m /mlapi/mlapi.py"
 s6-svscanctl -t /var/run/s6/services

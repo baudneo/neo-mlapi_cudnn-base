@@ -16,21 +16,19 @@ if [ "${PUID}" -ne 911 ] || [ "${PGID}" -ne 911 ]; then
 
   echo "Setting permissions for user www-data" | info "[${program_name}] "
   chown -R www-data:www-data \
-    /config
-  chown -R www-data:www-data \
+    /config \
     /mlapi
   chmod -R 755 \
-    /config
-  chmod -R 755 \
+    /config \
     /mlapi
 else
   echo "Setting permissions for user www-data" | info "[${program_name}] "
   chown -R www-data:www-data \
-    /config
-  chown -R www-data:www-data \
+    /config \
     /mlapi
   chmod -R 755 \
-    /config
+    /config \
+    /mlapi
 fi
 
 echo "Setting permissions for user nobody at /log" | info "[${program_name}] "
