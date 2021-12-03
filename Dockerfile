@@ -257,7 +257,7 @@ RUN   cd /opt && git clone https://github.com/openalpr/openalpr.git && cd ./open
        sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf
 
 # setup the compile environment and compile
-RUN   cmake \
+RUN   cp /opt/openalpr/build && cmake \
       -DCMAKE_INSTALL_PREFIX:PATH=/usr \
       -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc \
       -DCOMPILE_GPU=1 \
