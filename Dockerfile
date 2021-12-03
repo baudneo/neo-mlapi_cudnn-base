@@ -243,7 +243,7 @@ RUN   apt-get install -y python3-pip && pip3 install git+https://github.com/baud
 RUN   mkdir /mlapi
 
 RUN   cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && \
-      git checkout ${MLAPI_VERSION} \
+      git checkout ${MLAPI_VERSION} &&\
       python3 -m pip install ./requirements.txt
 
 # ALPR with GPU
