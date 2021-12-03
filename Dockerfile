@@ -229,7 +229,7 @@ RUN mkdir /config &&\
   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
   && ldconfig
     # Remove OpenCV sources and build folder
-RUN  rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
+RUN  cd / && rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
 
 # Install coral usb libraries
 RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
