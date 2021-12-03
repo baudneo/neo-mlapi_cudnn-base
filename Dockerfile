@@ -238,14 +238,6 @@ RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" 
 		apt-get update && apt-get -y install gasket-dkms libedgetpu1-std python3-pycoral &&\
         apt clean
 
-# neo-pyzm
-RUN   apt-get install -y python3-pip && pip3 install git+https://github.com/baudneo/pyzm.git
-RUN   mkdir /mlapi
-
-RUN   cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && \
-      git checkout ${MLAPI_VERSION} &&\
-      python3 -m pip install -r ./requirements.txt
-
 # ALPR with GPU
 # Install prerequisites
 # this includes all the ones missing from OpenALPR's guide.
@@ -279,25 +271,27 @@ RUN set -x \
     && groupmod -o -g 901 plugdev \
     && usermod -aG plugdev www-data #\
 
+# neo-pyzm
+RUN   python3 -m pip install git+https://github.com/baudneo/pyzm.git
 
-RUN set -x && \
-    mkdir -p /config/models && \
-    cp /mlapi/mlapi_dbuser.py /config && \
-    cp /mlapi/mlapi_face_train.py /config && \
-    cp /mlapi/get_encryption_key.py /config && \
-    cp /mlapi/images/ /config && \
-    cp /mlapi/known_faces/ /config && \
-    cp /mlapi/unknown_faces/ /config && \
-    cp /mlapi/tools/ /config && \
-    cp /mlapi/logs/ /config && \
-    cp /mlapi/db/ /config && \
-    cp /mlapi/examples/ /config && \
-    cp /mlapi/tools/ /config && \
-    cp /mlapi/get_models.sh /config && \
-    cp /mlapi/mlapiconfig.yml /config && \
-    cp /mlapi/mlapisecrets.yml /config
-
-
+RUN   mkdir /mlapi && cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && ls -alh && \
+      git checkout ${MLAPI_VERSION} &&\
+      python3 -m pip install -r ./requirements.txt && \
+      mkdir -p /config/models && \
+      cp /mlapi/mlapi_dbuser.py /config && \
+      cp /mlapi/mlapi_face_train.py /config && \
+      cp /mlapi/get_encryption_key.py /config && \
+      cp /mlapi/images/ /config && \
+      cp /mlapi/known_faces/ /config && \
+      cp /mlapi/unknown_faces/ /config && \
+      cp /mlapi/tools/ /config && \
+      cp /mlapi/logs/ /config && \
+      cp /mlapi/db/ /config && \
+      cp /mlapi/examples/ /config && \
+      cp /mlapi/tools/ /config && \
+      cp /mlapi/get_models.sh /config && \
+      cp /mlapi/mlapiconfig.yml /config && \
+      cp /mlapi/mlapisecrets.yml /config
 
 RUN set -x \
     && mkdir -p \
@@ -312,6 +306,7 @@ RUN set -x \
         /log \
     && chown -R nobody:nogroup \
         /log
+
 # download ML models
 RUN set -x \
     && ls -alh /config \
