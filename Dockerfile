@@ -142,7 +142,7 @@ RUN apt-get install -y \
 # Download & Build OpenCV in same RUN
 # OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
 RUN mkdir /config &&\
-    apt-get install -y zip &&\
+    apt-get install -y zip time &&\
     cd /opt/ &&\
     # Download and unzip OpenCV and opencv_contrib and delete zip files
     wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip &&\
