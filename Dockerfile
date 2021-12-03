@@ -8,7 +8,7 @@ ARG OPENCV_VERSION=4.5.4
 # 7.0 = TITAN V
 # 7.5 = 1650 thru to 2080ti including TITAN RTX
 # 8.6 = 3050 thru to 3090
-ARG CUDA_ARCH_BIN="6.1 7.5"
+ARG CUDA_ARCH_BIN=6.1,7.5
 ARG MLAPI_PORT=5000
 #####################################################################
 #                                                                   #
@@ -225,7 +225,7 @@ RUN mkdir /config &&\
     -DHAVE_opencv_python2=OFF \
     -DPYTHON_EXECUTABLE=/usr/bin/python3 \
     .. \
-  && time make -j${nproc --all} install \
+  && time make -j${nproc} install \
   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
   && ldconfig \
     # Remove OpenCV sources and build folder
@@ -235,7 +235,8 @@ RUN mkdir /config &&\
 RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
             tee /etc/apt/sources.list.d/coral-edgetpu.list && \
 		curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-		apt-get update && apt-get -y install gasket-dkms libedgetpu1-std python3-pycoral
+		apt-get update && apt-get -y install gasket-dkms libedgetpu1-std python3-pycoral &&\
+        apt clean
 
 # neo-pyzm
 RUN   python3 -m pip install git+https://github.com/baudneo/pyzm.git
