@@ -260,7 +260,7 @@ RUN   cd /opt && git clone https://github.com/openalpr/openalpr.git && cd ./open
 RUN   cmake \
       -DCMAKE_INSTALL_PREFIX:PATH=/usr \
       -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc \
-       –DCOMPILE_GPU=1 \
+      -DCOMPILE_GPU=1 \
        -DWITH_GPU_DETECTOR=ON \
        .. && \
       make -j"$(nproc)" && make install
