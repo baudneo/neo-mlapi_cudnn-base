@@ -63,6 +63,9 @@ ARG CUDA_ARCH_BIN
 RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y \
+     wget \
+     curl \
+     git \
     doxygen \
     file \
     gfortran \
