@@ -10,7 +10,7 @@
 MLAPI_FLAGS="--config /config/mlapiconfig.yml"
 
 if [ "${MLAPI_DEBUG_ENABLED}" -eq 1 ]; then
-  echo "Enabling ES Debug!" | info
+  echo "Enabling MLAPI Debug!" | info
   MLAPI_FLAGS="${MLAPI_FLAGS} --debug"
 fi
 

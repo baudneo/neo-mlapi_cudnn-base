@@ -5,6 +5,7 @@ services:
     build:
       context: ..
       dockerfile: ./Dockerfile
+    #image: mlapi_cudnn-base:latest
     container_name: mlapi
     restart: always
     ports:
@@ -31,7 +32,8 @@ services:
 
   zoneminder:
     container_name: zoneminder
-    image: ghcr.io/baudneo/eventserver-base:latest
+    image: ghcr.io/baudneo/eventserver-mlapi:latest
+#    image: eventserver-mlapi:latest
     restart: always
     stop_grace_period: 45s
     depends_on:

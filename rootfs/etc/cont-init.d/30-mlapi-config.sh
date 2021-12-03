@@ -7,6 +7,10 @@ if [ ! -f /config/mlapiconfig.yml ]; then
     logger -s "INFO: ${program_name}: /config/mlapiconfig.yml not found, creating..."
     cp /mlapi/mlapiconfig.yml /config/mlapiconfig.yml
 fi
+if [ ! -f /config/mlapisecrets.yml ]; then
+    logger -s "INFO: ${program_name}: /config/mlapisecrets.yml not found, creating..."
+    cp /mlapi/mlapisecrets.yml /config/mlapisecrets.yml
+fi
 
 # Configure mlapi config folder
 if [ ! -d "/config" ]; then
@@ -35,13 +39,13 @@ fi
 
 ## Configure MLAPI and ES for communication
 echo "Configuring Neo MLAPI Settings" | info "[${program_name}] "
-sed -i "s/base_data_path: .*$/base_data_path: \'/config\'/g" /config/mlapiconfig.yml
-sed -i "s/#wsgi_server: bjoern$/wsgi_server: bjoern/g" /config/mlapiconfig.yml
-sed -i "s/#log_user: .*$/log_user: www-data/g" /config/mlapiconfig.yml
-sed -i "s/#log_group: .*$/log_group: www-data/g" /config/mlapiconfig.yml
-sed -i "s/#log_path: .*$/log_path: /log/g" /config/mlapiconfig.yml
+sed -i "s|base_data_path:.*|base_data_path: /config|" /config/mlapiconfig.yml
+sed -i "s|#wsgi_server: bjoern|wsgi_server: bjoern|" /config/mlapiconfig.yml
+sed -i "s|#log_user:.*|log_user: www-data|" /config/mlapiconfig.yml
+sed -i "s|#log_group:.*|log_group: www-data|" /config/mlapiconfig.yml
+sed -i "s|#log_path:.*|log_path: /log|" /config/mlapiconfig.yml
 # db user
-python3 "-m mlapi_dbuser.py --force -c /config/mlapiconfig.yml -d /config/db -u ${MLAPIDB_USER} -p ${MLAPIDB_PASS}"
+python3 mlapi_dbuser.py --force -c /config/mlapiconfig.yml -d /config/db -u ${MLAPIDB_USER} -p ${MLAPIDB_PASS}
 # MLAPI_SECRET_KEY: MAKE me something unique I am for signing JWT
 if [ "${USE_SECURE_RANDOM_ORG}" -eq 1 ]; then
     echo "Fetching random secure string for MLAPI JWT signing key from random.org..." | init
@@ -54,6 +58,6 @@ if [ "${USE_SECURE_RANDOM_ORG}" -eq 1 ]; then
     echo "Generating standard random string for MLAPI JWT signing key..." | init
     random_string="$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM"
 fi
-sed -i "s/MLAPI_SECRET_KEY:.*$/MLAPI_SECRET_KEY: \"${random_string}\"/g" /config/mlapisecrets.yml
+sed -i "s|MLAPI_SECRET_KEY:.*|MLAPI_SECRET_KEY: \"${random_string}\"|" /config/mlapisecrets.yml
 
 
