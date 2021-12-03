@@ -15,7 +15,7 @@ if [ "${MLAPI_DEBUG_ENABLED}" -eq 1 ]; then
 fi
 
 echo "Starting Neo MLAPI..." | info
-s6-setuidgid www-data python3 -m /mlapi/mlapi.py \
+s6-setuidgid www-data python3 /mlapi/mlapi.py \
     ${MLAPI_FLAGS}
 
 echo "Neo MLAPI is up! Proceeding to monitoring." | info
