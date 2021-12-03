@@ -314,6 +314,7 @@ RUN set -x \
         /log
 # download ML models
 RUN set -x \
+    && ls -alh /config \
     && cd /config \
     && chmod +x /config/get_models.sh \
     && TARGET_DIR=/config/models \
