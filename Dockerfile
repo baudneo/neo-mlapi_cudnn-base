@@ -254,8 +254,7 @@ RUN   apt-get -y install libtesseract-dev libleptonica-dev liblog4cplus-dev libc
 # Clone the repo, copy config and enable gpu detections in config
 RUN   cd /opt && git clone https://github.com/openalpr/openalpr.git && cd ./openalpr/src && mkdir build && cd build \
       && cp /opt/openalpr/config/openalpr.conf.defaults /config/alpr.conf && \
-       sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf \
-      && rm -rf /opt/alpr
+       sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf
 
 # setup the compile environment and compile
 RUN   cmake " \
@@ -264,7 +263,7 @@ RUN   cmake " \
        –D COMPILE_GPU=1 \
        -D WITH_GPU_DETECTOR=ON \
        .." && \
-      make -j"$(nproc)" && make install \
+      make -j"$(nproc)" && make install
 # Copy config file with gpu detetcions active to /etc/openalpr/
 RUN   mv /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
 
