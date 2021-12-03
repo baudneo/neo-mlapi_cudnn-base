@@ -61,7 +61,39 @@ ARG OPENCV_VERSION
 ARG CUDA_ARCH_BIN
 
 RUN apt-get update && apt-get upgrade -y
+RUN apt-get update -y --fix-missing\
+  && apt-get install -y \
+    apt-utils \
+    locales \
+    wget \
+    ca-certificates \
+  && apt-get clean
 
+# UTF-8
+RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+ENV LANG en_US.utf8
+
+##### TensorFlow
+
+# Install system packages
+RUN apt-get install -y \
+    build-essential \
+    checkinstall \
+    cmake \
+    curl \
+    g++ \
+    gcc \
+    git \
+    perl \
+    pkg-config \
+    protobuf-compiler \
+    python3-dev \
+    rsync \
+    unzip \
+    wget \
+    zip \
+    zlib1g-dev \
+  && apt-get clean
 RUN apt-get install -y \
      wget \
      curl \
@@ -142,7 +174,7 @@ RUN apt-get install -y \
 # Download & Build OpenCV in same RUN
 # OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
 RUN mkdir /config &&\
-    apt-get install -y zip  &&\
+    apt-get install -y time &&\
     cd /opt/ &&\
     # Download and unzip OpenCV and opencv_contrib and delete zip files
     wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip &&\
@@ -153,7 +185,7 @@ RUN mkdir /config &&\
     rm ${OPENCV_VERSION}.zip &&\
     # Create build folder and switch to it
     mkdir -p /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build &&\
-     cmake \
+    time cmake \
     -DBUILD_DOCS=OFF \
     -DBUILD_EXAMPLES=OFF \
     -DBUILD_PERF_TESTS=OFF \
@@ -193,7 +225,7 @@ RUN mkdir /config &&\
     -DHAVE_opencv_python2=OFF \
     -DPYTHON_EXECUTABLE=/usr/bin/python3 \
     .. \
-  &&  make -j${nproc --all} install \
+  && time make -j${nproc --all} install \
   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
   && ldconfig \
     # Remove OpenCV sources and build folder
