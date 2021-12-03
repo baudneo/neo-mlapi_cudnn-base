@@ -250,7 +250,7 @@ RUN   cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && \
 # Install prerequisites
 # this includes all the ones missing from OpenALPR's guide.
 RUN   apt-get -y install libtesseract-dev libleptonica-dev liblog4cplus-dev libcurl3-dev libleptonica-dev && \
-      apt-get -y install libcurl4-openssl-dev liblog4cplus-dev \
+      apt-get -y install libcurl4-openssl-dev liblog4cplus-dev
 # Clone the repo, copy config and enable gpu detections in config
 RUN   cd /opt && git clone https://github.com/openalpr/openalpr.git && cd ./openalpr/src && mkdir build && cd build \
       && cp /opt/openalpr/config/openalpr.conf.defaults /config/alpr.conf && \
