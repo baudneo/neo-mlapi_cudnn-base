@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+program_name="mlapi-service"
+
+s6-format-filter "%1 %s" "[${program_name}]" | logutil-service /log/"${program_name}"

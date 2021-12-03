@@ -1,0 +1,60 @@
+version: '3.6'
+
+services:
+  mlapi:
+    build:
+      context: ..
+      dockerfile: ./Dockerfile
+    container_name: mlapi
+    restart: always
+    ports:
+      - 5000:5000
+    networks:
+      - zoneminder
+    volumes:
+      - ./mlapi/config:/config
+      - ./mlapi/log:/log
+    env_file:
+      - ../.env
+  db:
+    container_name: db
+    image: mariadb
+    restart: always
+    networks:
+      - zoneminder
+    volumes:
+      - ./zm/db:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=zm
+    env_file:
+      - ../.env
+
+  zoneminder:
+    image: ghcr.io/baudneo/eventserver-base:latest
+    container_name: zoneminder
+    restart: always
+    stop_grace_period: 45s
+    depends_on:
+      - db
+    ports:
+      - 80:80
+      - 443:443
+      - 9000:9000
+    networks:
+      - zoneminder
+    volumes:
+      - ./zm/data:/data
+      - ./zm/config:/config
+      - ./zm/log:/log
+      - type: tmpfs
+        target: /dev/shm
+        tmpfs:
+          size: 1000000000
+    env_file:
+      - ../.env
+#    environment:
+#      - ZM_SERVER_HOST=zoneminder1
+
+
+networks:
+  zoneminder:
