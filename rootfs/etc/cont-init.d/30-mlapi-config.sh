@@ -5,35 +5,45 @@ program_name="mlapi-config"
 
 if [ ! -f /config/mlapiconfig.yml ]; then
     logger -s "INFO: ${program_name}: /config/mlapiconfig.yml not found, creating..."
-    cp /mlapi/mlapiconfig.yml /config/mlapiconfig.yml
-fi
-if [ ! -f /config/mlapisecrets.yml ]; then
-    logger -s "INFO: ${program_name}: /config/mlapisecrets.yml not found, creating..."
-    cp /mlapi/mlapisecrets.yml /config/mlapisecrets.yml
+      s6-setuidgid www-data cp /mlapi/mlapi_dbuser.py /config
+  s6-setuidgid www-data cp /mlapi/mlapi_face_train.py /config
+  s6-setuidgid www-data cp /mlapi/get_encryption_key.py /config
+  s6-setuidgid www-data cp /mlapi/get_models.sh /config
+  s6-setuidgid www-data cp /mlapi/mlapiconfig.yml /config
+  s6-setuidgid www-data cp /mlapi/mlapisecrets.yml /config
+  s6-setuidgid www-data cp -r /mlapi/images/ /config
+  s6-setuidgid www-data cp -r /mlapi/known_faces/ /config
+  s6-setuidgid www-data cp -r /mlapi/unknown_faces/ /config
+  s6-setuidgid www-data cp -r /mlapi/tools/ /config
+  s6-setuidgid www-data cp -r /mlapi/models /config
+  s6-setuidgid www-data cp -r /mlapi/logs/ /config
+  s6-setuidgid www-data cp -r /mlapi/db/ /config
+  s6-setuidgid www-data cp -r /mlapi/examples/ /config
+  s6-setuidgid www-data cp -r /mlapi/tools/ /config
 fi
 
 # Configure mlapi config folder
 if [ ! -d "/config" ]; then
   echo "Configuring Neo MLAPI Configuration folder" | init "[${program_name}] "
 
-  s6-setuidgid www-data mkdir -p /config && \
-#  s6-setuidgid www-data mkdir -p /config/models && \
-  s6-setuidgid www-data cp /mlapi/mlapi_dbuser.py /config && \
-  s6-setuidgid www-data cp /mlapi/mlapi_face_train.py /config && \
-  s6-setuidgid www-data cp /mlapi/get_encryption_key.py /config && \
-  s6-setuidgid www-data cp /mlapi/get_models.sh /config && \
-  s6-setuidgid www-data cp /mlapi/mlapiconfig.yml /config && \
-  s6-setuidgid www-data cp /mlapi/mlapisecrets.yml /config && \
-  s6-setuidgid www-data cp -r /mlapi/images/ /config && \
-  s6-setuidgid www-data cp -r /mlapi/known_faces/ /config && \
-  s6-setuidgid www-data cp -r /mlapi/unknown_faces/ /config && \
-  s6-setuidgid www-data cp -r /mlapi/tools/ /config && \
-  s6-setuidgid www-data cp -r /mlapi/models /config && \
-  s6-setuidgid www-data cp -r /mlapi/logs/ /config && \
-  s6-setuidgid www-data cp -r /mlapi/db/ /config && \
-  s6-setuidgid www-data cp -r /mlapi/examples/ /config && \
-  s6-setuidgid www-data cp -r /mlapi/tools/ /config && \
-  chmod -R 755 /config && \
+  s6-setuidgid www-data mkdir -p /config
+#  s6-setuidgid www-data mkdir -p /config/models
+  s6-setuidgid www-data cp /mlapi/mlapi_dbuser.py /config
+  s6-setuidgid www-data cp /mlapi/mlapi_face_train.py /config
+  s6-setuidgid www-data cp /mlapi/get_encryption_key.py /config
+  s6-setuidgid www-data cp /mlapi/get_models.sh /config
+  s6-setuidgid www-data cp /mlapi/mlapiconfig.yml /config
+  s6-setuidgid www-data cp /mlapi/mlapisecrets.yml /config
+  s6-setuidgid www-data cp -r /mlapi/images/ /config
+  s6-setuidgid www-data cp -r /mlapi/known_faces/ /config
+  s6-setuidgid www-data cp -r /mlapi/unknown_faces/ /config
+  s6-setuidgid www-data cp -r /mlapi/tools/ /config
+  s6-setuidgid www-data cp -r /mlapi/models /config
+  s6-setuidgid www-data cp -r /mlapi/logs/ /config
+  s6-setuidgid www-data cp -r /mlapi/db/ /config
+  s6-setuidgid www-data cp -r /mlapi/examples/ /config
+  s6-setuidgid www-data cp -r /mlapi/tools/ /config
+  chmod -R 755 /config
   chown -R www-data:www-data /config
 fi
 
