@@ -1,6 +1,15 @@
+# syntax=docker/dockerfile:experimental
+ARG S6_ARCH=amd64
 ARG MLAPI_VERSION=master
-
-
+ARG OPENCV_VERSION=4.5.4
+# I think a minimum of 6.1 Compute Cabability required - these are GeForce cards
+# CHECK https://developer.nvidia.com/cuda-gpus#compute
+# 6.1 = 1050 thru to 1080ti includes TITAN X and TITAN XP
+# 7.0 = TITAN V
+# 7.5 = 1650 thru to 2080ti including TITAN RTX
+# 8.6 = 3050 thru to 3090
+ARG CUDA_ARCH_BIN="6.1 7.5"
+ARG MLAPI_PORT=5000
 #####################################################################
 #                                                                   #
 # Convert rootfs to LF using dos2unix                               #
@@ -46,8 +55,10 @@ RUN set -x \
 #                                                                   #
 #####################################################################
 
-FROM  nvidia/cuda:11.4.2-cudnn8-runtime-ubuntu20.04 as base_image
-
+FROM  nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04 as base_image
+ARG DEBIAN_FRONTEND=noninteractive
+ARG OPENCV_VERSION
+ARG CUDA_ARCH_BIN
 
 RUN apt-get update && apt-get upgrade -y &&\
     # Install build tools, build dependencies and python
@@ -95,19 +106,21 @@ RUN apt-get update && apt-get upgrade -y &&\
         python3-numpy \
     && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir /config
+# https://github.com/opencv/opencv/archive/refs/tags/4.5.4.zip
     # OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
 RUN cd /opt/ &&\
     # Download and unzip OpenCV and opencv_contrib and delete zip files
-    wget https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip &&\
-    unzip $OPENCV_VERSION.zip &&\
-    rm $OPENCV_VERSION.zip &&\
-    wget https://github.com/opencv/opencv_contrib/archive/$OPENCV_VERSION.zip &&\
+    wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip &&\
+    unzip ${OPENCV_VERSION}.zip &&\
+    rm ${OPENCV_VERSION}.zip &&\
+    wget https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip &&\
     unzip ${OPENCV_VERSION}.zip &&\
     rm ${OPENCV_VERSION}.zip &&\
     # Create build folder and switch to it
-    mkdir /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build &&\
+    mkdir -p /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build &&\
     # Cmake configure
-   cmake "-D CMAKE_BUILD_TYPE=RELEASE \
+   cmake -D CMAKE_BUILD_TYPE=RELEASE \
 		-D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
         -D CMAKE_INSTALL_PREFIX=/usr/local \
         -D INSTALL_PYTHON_EXAMPLES=OFF \
@@ -122,23 +135,23 @@ RUN cd /opt/ &&\
         -D WITH_CUBLAS=1 \
         -D HAVE_opencv_python3=ON \
         -D PYTHON_EXECUTABLE=/usr/bin/python3 \
-        -D BUILD_EXAMPLES=OFF .. > /config/opencv/cmake.log" &&\
-    # Make
-    make -j"$(nproc)" && \
+        -D BUILD_EXAMPLES=OFF .. > /config/opencv-cmake.log && \
+    make -j${nproc} && \
     # Install to /usr/local/lib
-    make install && \
+    make -j${nproc} install && \
     ldconfig &&\
     # Remove OpenCV sources and build folder
     rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
 
-    # install coral usb libraries
-RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list && \
+# Install coral usb libraries
+RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
+            tee /etc/apt/sources.list.d/coral-edgetpu.list && \
 		curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
 		apt-get update && apt-get -y install gasket-dkms libedgetpu1-std python3-pycoral
 
-    # neo-pyzm
+# neo-pyzm
 RUN   python3 -m pip install git+https://github.com/baudneo/pyzm.git
-RUN   mkdir /config && mkdir /mlapi
+RUN   mkdir /mlapi
 
 RUN   cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && \
       git checkout ${MLAPI_VERSION} \
@@ -213,10 +226,9 @@ RUN set -x \
         /log \
     && chown -R nobody:nogroup \
         /log
-# Create MLAPI DB user, download ML models
+# download ML models
 RUN set -x \
     && cd /config \
-    && python3 "-m mlapi_dbuser.py --force -c /config/mlapiconfig.yml -d /config/db -u ${MLAPIDB_USER} -p ${MLAPIDB_PASS}" \
     && chmod +x /config/get_models.sh \
     && TARGET_DIR=/config/models \
     INSTALL_YOLOV3=yes \
@@ -224,30 +236,26 @@ RUN set -x \
     INSTALL_CORAL_EDGETPU=yes \
     ./get_models.sh
 
-    # Install s6 overlay
+# Install s6 overlay
 COPY --from=s6downloader /s6downloader /
 # Copy rootfs
 COPY --from=rootfs-converter /rootfs /
 
 # System Variables
 ENV \
+    S6_FIX_ATTRS_HIDDEN=1 \
+    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     SOCKLOG_TIMESTAMP_FORMAT="" \
     MAX_LOG_SIZE_BYTES=1000000 \
     MAX_LOG_NUMBER=10
 
 # User default variables
-ENV     OPENCV_VERSION=4.5.4
-        CUDA_ARCH_BIN=7.5
-        MLAPIDB_USER=mlapi_user
-        MLAPIDB_PASS=ZoneMinder
-        MLAPI_CONTAINER=mlapi
-        MLAPI_PORT=5000
-        MLAPI_DEBUG_ENABLED=1
-        PUID=911
-        PGID=911
-        TZ="America/Chicago"
+ENV     \
+        PUID=911\
+        PGID=911\
+        TZ="America/Chicago"\
         USE_SECURE_RANDOM_ORG=1
-# Default mlapi port is 5000
+
 EXPOSE 5000/tcp
 
 CMD ["/init"]

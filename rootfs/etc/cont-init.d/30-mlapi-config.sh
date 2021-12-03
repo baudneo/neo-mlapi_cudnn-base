@@ -40,9 +40,9 @@ sed -i "s/#wsgi_server: bjoern$/wsgi_server: bjoern/g" /config/mlapiconfig.yml
 sed -i "s/#log_user: .*$/log_user: www-data/g" /config/mlapiconfig.yml
 sed -i "s/#log_group: .*$/log_group: www-data/g" /config/mlapiconfig.yml
 sed -i "s/#log_path: .*$/log_path: /log/g" /config/mlapiconfig.yml
-
+# db user
+python3 "-m mlapi_dbuser.py --force -c /config/mlapiconfig.yml -d /config/db -u ${MLAPIDB_USER} -p ${MLAPIDB_PASS}"
 # MLAPI_SECRET_KEY: MAKE me something unique I am for signing JWT
-sd
 if [ "${USE_SECURE_RANDOM_ORG}" -eq 1 ]; then
     echo "Fetching random secure string for MLAPI JWT signing key from random.org..." | init
     random_string=$(
