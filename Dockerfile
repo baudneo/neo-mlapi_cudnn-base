@@ -241,10 +241,10 @@ RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" 
 # ALPR with GPU
 # Install prerequisites
 # this includes all the ones missing from OpenALPR's guide.
-RUN   apt-get -y install libtesseract-dev libleptonica-dev liblog4cplus-dev libcurl3-dev libleptonica-dev && \
-      apt-get -y install libcurl4-openssl-dev liblog4cplus-dev
+RUN   apt-get -y install python3-pip libtesseract-dev libleptonica-dev liblog4cplus-dev libcurl3-dev libleptonica-dev \
+      libcurl4-openssl-dev liblog4cplus-dev && \
 # Clone the repo, copy config and enable gpu detections in config
-RUN   cd /opt && git clone https://github.com/openalpr/openalpr.git && cd /opt/openalpr/src && mkdir build && cd build \
+      cd /opt && git clone https://github.com/openalpr/openalpr.git && cd /opt/openalpr/src && mkdir build && cd build \
       && cp /opt/openalpr/config/openalpr.conf.defaults /config/alpr.conf && \
        sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf
 
@@ -257,7 +257,7 @@ RUN   cd /opt/openalpr/src/build && cmake \
        .. && \
       make -j"$(nproc)" && make install
 # Copy config file with gpu detetcions active to /etc/openalpr/
-RUN   mv /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
+RUN   cp /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
 
 # Make sure face_recognition and DLib are installed
 RUN   python3 -m pip install face_recognition
@@ -272,10 +272,9 @@ RUN set -x \
     && usermod -aG plugdev www-data #\
 
 # neo-pyzm
-RUN   python3 -m pip install git+https://github.com/baudneo/pyzm.git
-
-RUN   mkdir /mlapi && cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && ls -alh && \
-      git checkout ${MLAPI_VERSION} &&\
+RUN   apt-get install -y python3-pip && python3 -m pip install git+https://github.com/baudneo/pyzm.git && \
+      mkdir /mlapi && cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && ls -alh && \
+      git checkout ${MLAPI_VERSION} && \
       python3 -m pip install -r ./requirements.txt && \
       mkdir -p /config/models && \
       cp /mlapi/mlapi_dbuser.py /config && \
@@ -306,7 +305,6 @@ RUN set -x \
         /log \
     && chown -R nobody:nogroup \
         /log
-
 # download ML models
 RUN set -x \
     && ls -alh /config \
