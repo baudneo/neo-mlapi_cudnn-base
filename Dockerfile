@@ -142,7 +142,7 @@ RUN apt-get install -y \
 # Download & Build OpenCV in same RUN
 # OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
 RUN mkdir /config &&\
-    apt-get install -y zip time &&\
+    apt-get install -y zip  &&\
     cd /opt/ &&\
     # Download and unzip OpenCV and opencv_contrib and delete zip files
     wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip &&\
@@ -153,7 +153,7 @@ RUN mkdir /config &&\
     rm ${OPENCV_VERSION}.zip &&\
     # Create build folder and switch to it
     mkdir -p /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build &&\
-    time cmake \
+     cmake \
     -DBUILD_DOCS=OFF \
     -DBUILD_EXAMPLES=OFF \
     -DBUILD_PERF_TESTS=OFF \
@@ -193,7 +193,7 @@ RUN mkdir /config &&\
     -DHAVE_opencv_python2=OFF \
     -DPYTHON_EXECUTABLE=/usr/bin/python3 \
     .. \
-  && time make -j${nproc --all} install \
+  &&  make -j${nproc --all} install \
   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
   && ldconfig \
     # Remove OpenCV sources and build folder
