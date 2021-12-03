@@ -312,6 +312,7 @@ RUN set -x \
     INSTALL_CORAL_EDGETPU=yes \
     /config/get_models.sh &&\
     rm -rf /root/.cache/pip
+RUN apt-get install -y openssl libssl-dev
 # Install s6 overlay
 COPY --from=s6downloader /s6downloader /
 # Copy rootfs
