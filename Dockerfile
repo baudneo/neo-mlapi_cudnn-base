@@ -320,7 +320,7 @@ RUN set -x \
     INSTALL_YOLOV3=yes \
     INSTALL_YOLOV4=yes \
     INSTALL_CORAL_EDGETPU=yes \
-    ./get_models.sh
+    /config/get_models.sh
 
 # Install s6 overlay
 COPY --from=s6downloader /s6downloader /
