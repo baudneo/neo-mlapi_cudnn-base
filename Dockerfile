@@ -239,7 +239,7 @@ RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" 
         apt clean
 
 # neo-pyzm
-RUN   python3 -m pip install git+https://github.com/baudneo/pyzm.git
+RUN   pip3 install git+https://github.com/baudneo/pyzm.git
 RUN   mkdir /mlapi
 
 RUN   cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && \
