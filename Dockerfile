@@ -135,7 +135,7 @@ RUN cd /opt/ &&\
         -D WITH_CUBLAS=1 \
         -D HAVE_opencv_python3=ON \
         -D PYTHON_EXECUTABLE=/usr/bin/python3 \
-        -D BUILD_EXAMPLES=OFF .. > /config/opencv-cmake.log && \
+        -D BUILD_EXAMPLES=OFF .. && \
     make -j${nproc} && \
     # Install to /usr/local/lib
     make -j${nproc} install && \
