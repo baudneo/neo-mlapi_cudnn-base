@@ -30,6 +30,7 @@ sed -i "s|#wsgi_server: bjoern|wsgi_server: bjoern|" /config/mlapiconfig.yml
 sed -i "s|#log_user:.*|log_user: www-data|" /config/mlapiconfig.yml
 sed -i "s|#log_group:.*|log_group: www-data|" /config/mlapiconfig.yml
 sed -i "s|#log_path:.*|log_path: /log|" /config/mlapiconfig.yml
+sed -i "s|#log_name:.*|log_name: mlapi-service|" /config/mlapiconfig.yml
 # db user, ensures there is always at least 1 default user
 python3 /config/mlapi_dbuser.py --force -c /config/mlapiconfig.yml -d /config/db -u ${MLAPIDB_USER} -p ${MLAPIDB_PASS}
 # If the JWT key is default, create a new one (dont need to create one every restart)
