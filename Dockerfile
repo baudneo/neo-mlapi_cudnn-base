@@ -60,56 +60,86 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG OPENCV_VERSION
 ARG CUDA_ARCH_BIN
 
-RUN apt-get update && apt-get upgrade -y &&\
-    # Install build tools, build dependencies and python
-    apt-get install -y \
-	python3-pip \
-        build-essential \
-        cmake \
-        git \
-        wget \
-        unzip \
-        yasm \
-        pkg-config \
-        libswscale-dev \
-        libtbb2 \
-        libtbb-dev \
-        libjpeg-dev \
-        libpng-dev \
-        libtiff-dev \
-        libavformat-dev \
-        libpq-dev \
-        libxine2-dev \
-        libglew-dev \
-        libtiff5-dev \
-        zlib1g-dev \
-        libjpeg-dev \
-        libavcodec-dev \
-        libavformat-dev \
-        libavutil-dev \
-        libpostproc-dev \
-        libswscale-dev \
-        libeigen3-dev \
-        libtbb-dev \
-        libgtk2.0-dev \
-        pkg-config \
-        gfortran \
-        libatlas-base-dev \
-        libopenblas-dev \
-        liblapack-dev \
-        libblas-dev \
-        libev-dev \
-        libevdev2 \
-        libgeos-dev \
-        ## Python
-        python3-dev \
-        python3-numpy \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get upgrade -y
 
-RUN mkdir /config
-# https://github.com/opencv/opencv/archive/refs/tags/4.5.4.zip
-    # OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
-RUN cd /opt/ &&\
+RUN apt-get install -y \
+    doxygen \
+    file \
+    gfortran \
+    gnupg \
+    gstreamer1.0-plugins-good \
+    imagemagick \
+    libatk-adaptor \
+    libatlas-base-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
+    libboost-all-dev \
+    libcanberra-gtk-module \
+    libdc1394-22-dev \
+    libeigen3-dev \
+    libfaac-dev \
+    libfreetype6-dev \
+    libgflags-dev \
+    libglew-dev \
+    libglu1-mesa \
+    libglu1-mesa-dev \
+    libgoogle-glog-dev \
+    libgphoto2-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-bad1.0-0 \
+    libgstreamer-plugins-base1.0-dev \
+    libgtk2.0-dev \
+    libgtk-3-dev \
+    libhdf5-dev \
+    libhdf5-serial-dev \
+    libjpeg-dev \
+    liblapack-dev \
+    libmp3lame-dev \
+    libopenblas-dev \
+    libopencore-amrnb-dev \
+    libopencore-amrwb-dev \
+    libopenjp2-7 \
+    libopenjp2-7-dev \
+    libopenjp2-tools \
+    libopenjpip-server \
+    libpng-dev \
+    libpostproc-dev \
+    libprotobuf-dev \
+    libswscale-dev \
+    libtbb2 \
+    libtbb-dev \
+    libtheora-dev \
+    libtiff5-dev \
+    libv4l-dev \
+    libvorbis-dev \
+    libx264-dev \
+    libxi-dev \
+    libxine2-dev \
+    libxmu-dev \
+    libxvidcore-dev \
+    libzmq3-dev \
+    v4l-utils \
+    x11-apps \
+    x264 \
+    yasm \
+    gfortran \
+    libatlas-base-dev \
+    libopenblas-dev \
+    liblapack-dev \
+    libblas-dev \
+    libev-dev \
+    libevdev2 \
+    libgeos-dev \
+    ## Python
+    python3-dev \
+    python3-numpy \
+    && apt-get clean
+
+# Download & Build OpenCV in same RUN
+# OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
+RUN mkdir /config &&\
+ cd /opt/ &&\
     # Download and unzip OpenCV and opencv_contrib and delete zip files
     wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip &&\
     unzip ${OPENCV_VERSION}.zip &&\
@@ -119,27 +149,49 @@ RUN cd /opt/ &&\
     rm ${OPENCV_VERSION}.zip &&\
     # Create build folder and switch to it
     mkdir -p /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build &&\
-    # Cmake configure
-   cmake -D CMAKE_BUILD_TYPE=RELEASE \
-		-D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
-        -D CMAKE_INSTALL_PREFIX=/usr/local \
-        -D INSTALL_PYTHON_EXAMPLES=OFF \
-        -D INSTALL_C_EXAMPLES=OFF \
-        -D OPENCV_ENABLE_NONFREE=ON \
-        -D WITH_CUDA=ON \
-        -D WITH_CUDNN=ON \
-        -D OPENCV_DNN_CUDA=ON \
-        -D CUDA_ARCH_BIN=${CUDA_ARCH_BIN} \
-        -D ENABLE_FAST_MATH=1 \
-        -D CUDA_FAST_MATH=1 \
-        -D WITH_CUBLAS=1 \
-        -D HAVE_opencv_python3=ON \
-        -D PYTHON_EXECUTABLE=/usr/bin/python3 \
-        -D BUILD_EXAMPLES=OFF .. && \
-    make -j${nproc} && \
-    # Install to /usr/local/lib
-    make -j${nproc} install && \
-    ldconfig &&\
+    time cmake \
+    -DBUILD_DOCS=OFF \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_PERF_TESTS=OFF \
+    -DBUILD_TESTS=OFF \
+    -DBUILD_opencv_python2=OFF \
+    -DBUILD_opencv_python3=ON \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr/local/ \
+    -DCMAKE_INSTALL_TYPE=Release \
+    -DFORCE_VTK=ON \
+    -DINSTALL_C_EXAMPLES=OFF \
+    -DINSTALL_PYTHON_EXAMPLES=OFF \
+    -DOPENCV_GENERATE_PKGCONFIG=ON \
+    -DWITH_CSTRIPES=ON \
+    -DWITH_EIGEN=ON \
+    -DWITH_GDAL=ON \
+    -DWITH_GSTREAMER=ON \
+    -DWITH_GSTREAMER_0_10=OFF \
+    -DWITH_GTK=ON \
+    -DWITH_IPP=ON \
+    -DWITH_OPENCL=ON \
+    -DWITH_OPENMP=ON \
+    -DWITH_TBB=ON \
+    -DWITH_V4L=ON \
+    -DWITH_WEBP=ON \
+    -DWITH_XINE=ON \
+    -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
+    -DOPENCV_ENABLE_NONFREE=ON \
+    -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN} \
+    -DWITH_CUDA=ON \
+    -DWITH_CUDNN=ON \
+    -DOPENCV_DNN_CUDA=ON \
+    -DENABLE_FAST_MATH=1 \
+    -DCUDA_FAST_MATH=1 \
+    -DWITH_CUBLAS=1 \
+    -DHAVE_opencv_python3=ON \
+    -DHAVE_opencv_python2=OFF \
+    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+    .. \
+  && time make -j${nproc --all} install \
+  && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
+  && ldconfig \
     # Remove OpenCV sources and build folder
     rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
 
@@ -246,7 +298,7 @@ ENV \
     S6_FIX_ATTRS_HIDDEN=1 \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     SOCKLOG_TIMESTAMP_FORMAT="" \
-    MAX_LOG_SIZE_BYTES=1000000 \
+    MAX_LOG_SIZE_BYTES=10000000 \
     MAX_LOG_NUMBER=10
 
 # User default variables
