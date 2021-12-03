@@ -257,12 +257,12 @@ RUN   cd /opt && git clone https://github.com/openalpr/openalpr.git && cd ./open
        sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf
 
 # setup the compile environment and compile
-RUN   cmake " \
-      -D CMAKE_INSTALL_PREFIX:PATH=/usr \
-      -D CMAKE_INSTALL_SYSCONFDIR:PATH=/etc \
-       –D COMPILE_GPU=1 \
-       -D WITH_GPU_DETECTOR=ON \
-       .." && \
+RUN   cmake \
+      -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+      -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc \
+       –DCOMPILE_GPU=1 \
+       -DWITH_GPU_DETECTOR=ON \
+       .. && \
       make -j"$(nproc)" && make install
 # Copy config file with gpu detetcions active to /etc/openalpr/
 RUN   mv /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
