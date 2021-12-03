@@ -255,9 +255,8 @@ RUN   cd /opt/openalpr/src/build && cmake \
       -DCOMPILE_GPU=1 \
        -DWITH_GPU_DETECTOR=ON \
        .. && \
-      make -j"$(nproc)" && make install
-# Copy config file with gpu detetcions active to /etc/openalpr/
-RUN   cp /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
+      make -j"$(nproc)" && make install && \
+      cp /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
 
 # Make sure face_recognition and DLib are installed
 RUN   python3 -m pip install face_recognition
@@ -265,14 +264,12 @@ RUN   python3 -m pip install face_recognition
 ## Create www-data user
 RUN set -x \
     && groupmod -o -g 911 www-data \
-    && usermod -o -u 911 www-data
-# Create plugdev user/group for TPU and add www-data to its group (add plugdev to www-data?)
-RUN set -x \
-    && groupmod -o -g 901 plugdev \
-    && usermod -aG plugdev www-data #\
+    && usermod -o -u 911 www-data \
+    && usermod -aG plugdev www-data
 
 # neo-pyzm
-RUN   apt-get install -y python3-pip && python3 -m pip install git+https://github.com/baudneo/pyzm.git && \
+RUN   set -x \
+      python3 -m pip install git+https://github.com/baudneo/pyzm.git && \
       mkdir /mlapi && cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && ls -alh && \
       git checkout ${MLAPI_VERSION} && \
       python3 -m pip install -r ./requirements.txt && \
@@ -314,7 +311,8 @@ RUN set -x \
     INSTALL_YOLOV3=yes \
     INSTALL_YOLOV4=yes \
     INSTALL_CORAL_EDGETPU=yes \
-    /config/get_models.sh
+    /config/get_models.sh &&\
+    rm -rf /root/.cache/pip
 
 # Install s6 overlay
 COPY --from=s6downloader /s6downloader /
