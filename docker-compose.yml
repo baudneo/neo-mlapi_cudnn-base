@@ -3,7 +3,7 @@ version: '3.6'
 services:
   mlapi:
     build:
-      context: ..
+      context: .
       dockerfile: ./Dockerfile
     #image: mlapi_cudnn-base:latest
     container_name: mlapi
