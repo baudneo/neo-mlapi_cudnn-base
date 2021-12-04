@@ -340,7 +340,7 @@ RUN set -x \
 # download ML models
 RUN set -x \
     && cd /config \
-    && chmod +x "/config/*.sh" \
+    && chmod +x /config/get_models.sh \
     &&  TARGET_DIR=/config/models \
         INSTALL_YOLOV3=yes \
         INSTALL_YOLOV4=yes \
