@@ -320,7 +320,6 @@ RUN set -x \
 COPY --from=s6downloader /s6downloader /
 # Copy rootfs
 COPY --from=rootfs-converter /rootfs /
-RUN     set -x && rm -rf /root/.cache/pip
 
 # System Variables
 ENV \
