@@ -311,12 +311,12 @@ RUN set -x \
     INSTALL_YOLOV3=yes \
     INSTALL_YOLOV4=yes \
     INSTALL_CORAL_EDGETPU=yes \
-    /config/get_models.sh &&\
-    rm -rf /root/.cache/pip
+    /config/get_models.sh
 # Install s6 overlay
 COPY --from=s6downloader /s6downloader /
 # Copy rootfs
 COPY --from=rootfs-converter /rootfs /
+RUN     rm -rf /root/.cache/pip
 
 # System Variables
 ENV \
