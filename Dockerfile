@@ -60,8 +60,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG OPENCV_VERSION
 ARG CUDA_ARCH_BIN
 
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get update -y --fix-missing\
+RUN set -x\
+    && apt-get update && apt-get upgrade -y
+RUN set -x \
+  && apt-get update -y --fix-missing\
   && apt-get install -y \
     apt-utils \
     locales \
@@ -70,13 +72,13 @@ RUN apt-get update -y --fix-missing\
   && apt-get clean
 
 # UTF-8
-RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+RUN set -x && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
 ##### TensorFlow
 
 # Install system packages
-RUN apt-get install -y \
+RUN set -x && apt-get install -y \
     build-essential \
     checkinstall \
     cmake \
@@ -94,7 +96,8 @@ RUN apt-get install -y \
     zip \
     zlib1g-dev \
   && apt-get clean
-RUN apt-get install -y \
+
+RUN set -x && apt-get install -y \
      wget \
      curl \
      git \
@@ -174,7 +177,7 @@ RUN apt-get install -y \
 
 # Download & Build OpenCV in same RUN
 # OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
-RUN mkdir /config &&\
+RUN set -x && mkdir /config &&\
     apt-get install -y time &&\
     cd /opt/ &&\
     # Download and unzip OpenCV and opencv_contrib and delete zip files
@@ -230,10 +233,10 @@ RUN mkdir /config &&\
   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
   && ldconfig
     # Remove OpenCV sources and build folder
-RUN  cd / && rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
+RUN  set -x && cd / && rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
 
 # Install coral usb libraries
-RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
+RUN 	set -x && echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
             tee /etc/apt/sources.list.d/coral-edgetpu.list && \
 		curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
 		apt-get update && apt-get -y install gasket-dkms libedgetpu1-std python3-pycoral &&\
@@ -242,15 +245,16 @@ RUN 	echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" 
 # ALPR with GPU
 # Install prerequisites
 # this includes all the ones missing from OpenALPR's guide.
-RUN   apt-get -y install python3-pip libtesseract-dev libleptonica-dev liblog4cplus-dev libcurl3-dev libleptonica-dev \
-      libcurl4-openssl-dev liblog4cplus-dev && \
+RUN   set -x && \
+      apt-get -y install python3-pip libtesseract-dev libleptonica-dev liblog4cplus-dev \
+      libcurl3-dev libleptonica-dev libcurl4-openssl-dev liblog4cplus-dev && \
 # Clone the repo, copy config and enable gpu detections in config
       cd /opt && git clone https://github.com/openalpr/openalpr.git && cd /opt/openalpr/src && mkdir build && cd build \
       && cp /opt/openalpr/config/openalpr.conf.defaults /config/alpr.conf && \
        sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf
 
 # setup the compile environment and compile
-RUN   cd /opt/openalpr/src/build && cmake \
+RUN   set -x && cd /opt/openalpr/src/build && cmake \
       -DCMAKE_INSTALL_PREFIX:PATH=/usr \
       -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc \
       -DCOMPILE_GPU=1 \
@@ -260,7 +264,7 @@ RUN   cd /opt/openalpr/src/build && cmake \
       cp /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
 
 # Make sure face_recognition and DLib are installed
-RUN   python3 -m pip install face_recognition
+RUN   set -x && python3 -m pip install face_recognition
 
 ## Create www-data user
 RUN set -x \
@@ -316,7 +320,7 @@ RUN set -x \
 COPY --from=s6downloader /s6downloader /
 # Copy rootfs
 COPY --from=rootfs-converter /rootfs /
-RUN     rm -rf /root/.cache/pip
+RUN     set -x && rm -rf /root/.cache/pip
 
 # System Variables
 ENV \
