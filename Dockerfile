@@ -60,8 +60,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG OPENCV_VERSION
 ARG CUDA_ARCH_BIN
 
-RUN set -x\
-    && apt-get update && apt-get upgrade -y
+
 RUN set -x \
   && apt-get update -y --fix-missing\
   && apt-get install -y \
@@ -69,230 +68,261 @@ RUN set -x \
     locales \
     wget \
     ca-certificates \
-  && apt-get clean
+  && apt-get clean \
+  && apt-get upgrade -y
 
 # UTF-8
-RUN set -x && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+RUN set -x \
+    && localedef \
+        -i en_US \
+        -c -f UTF-8 \
+        -A /usr/share/locale/locale.alias \
+        en_US.UTF-8
 ENV LANG en_US.utf8
 
-##### TensorFlow
-
 # Install system packages
-RUN set -x && apt-get install -y \
-    build-essential \
-    checkinstall \
-    cmake \
-    curl \
-    g++ \
-    gcc \
-    git \
-    perl \
-    pkg-config \
-    protobuf-compiler \
-    python3-dev \
-    rsync \
-    unzip \
-    wget \
-    zip \
-    zlib1g-dev \
+RUN set -x \
+    && apt-get install -y \
+        build-essential \
+        checkinstall \
+        cmake \
+        curl \
+        g++ \
+        gcc \
+        git \
+        perl \
+        pkg-config \
+        protobuf-compiler \
+        python3-dev \
+        rsync \
+        unzip \
+        wget \
+        zip \
+        zlib1g-dev \
   && apt-get clean
-
-RUN set -x && apt-get install -y \
-     wget \
-     curl \
-     git \
-    doxygen \
-    file \
-    gfortran \
-    gnupg \
-    gstreamer1.0-plugins-good \
-    imagemagick \
-    libatk-adaptor \
-    libatlas-base-dev \
-    libavcodec-dev \
-    libavformat-dev \
-    libavutil-dev \
-    libboost-all-dev \
-    libcanberra-gtk-module \
-    libdc1394-22-dev \
-    libeigen3-dev \
-    libfaac-dev \
-    libfreetype6-dev \
-    libgflags-dev \
-    libglew-dev \
-    libglu1-mesa \
-    libglu1-mesa-dev \
-    libgoogle-glog-dev \
-    libgphoto2-dev \
-    libgstreamer1.0-dev \
-    libgstreamer-plugins-bad1.0-0 \
-    libgstreamer-plugins-base1.0-dev \
-    libgtk2.0-dev \
-    libgtk-3-dev \
-    libhdf5-dev \
-    libhdf5-serial-dev \
-    libjpeg-dev \
-    liblapack-dev \
-    libmp3lame-dev \
-    libopenblas-dev \
-    libopencore-amrnb-dev \
-    libopencore-amrwb-dev \
-    libopenjp2-7 \
-    libopenjp2-7-dev \
-    libopenjp2-tools \
-    libopenjpip-server \
-    libpng-dev \
-    libpostproc-dev \
-    libprotobuf-dev \
-    libswscale-dev \
-    libtbb2 \
-    libtbb-dev \
-    libtheora-dev \
-    libtiff5-dev \
-    libv4l-dev \
-    libvorbis-dev \
-    libx264-dev \
-    libxi-dev \
-    libxine2-dev \
-    libxmu-dev \
-    libxvidcore-dev \
-    libzmq3-dev \
-    v4l-utils \
-    x11-apps \
-    x264 \
-    yasm \
-    gfortran \
-    libatlas-base-dev \
-    libopenblas-dev \
-    liblapack-dev \
-    libblas-dev \
-    libev-dev \
-    libevdev2 \
-    libgeos-dev \
-    libssl-dev \
-    ## Python
-    python3-dev \
-    python3-numpy \
+# Libs
+RUN set -x \
+    && apt-get install -y \
+        wget \
+        curl \
+        git \
+        doxygen \
+        file \
+        gfortran \
+        gnupg \
+        gstreamer1.0-plugins-good \
+        imagemagick \
+        libatk-adaptor \
+        libatlas-base-dev \
+        libavcodec-dev \
+        libavformat-dev \
+        libavutil-dev \
+        libboost-all-dev \
+        libcanberra-gtk-module \
+        libdc1394-22-dev \
+        libeigen3-dev \
+        libfaac-dev \
+        libfreetype6-dev \
+        libgflags-dev \
+        libglew-dev \
+        libglu1-mesa \
+        libglu1-mesa-dev \
+        libgoogle-glog-dev \
+        libgphoto2-dev \
+        libgstreamer1.0-dev \
+        libgstreamer-plugins-bad1.0-0 \
+        libgstreamer-plugins-base1.0-dev \
+        libgtk2.0-dev \
+        libgtk-3-dev \
+        libhdf5-dev \
+        libhdf5-serial-dev \
+        libjpeg-dev \
+        liblapack-dev \
+        libmp3lame-dev \
+        libopenblas-dev \
+        libopencore-amrnb-dev \
+        libopencore-amrwb-dev \
+        libopenjp2-7 \
+        libopenjp2-7-dev \
+        libopenjp2-tools \
+        libopenjpip-server \
+        libpng-dev \
+        libpostproc-dev \
+        libprotobuf-dev \
+        libswscale-dev \
+        libtbb2 \
+        libtbb-dev \
+        libtheora-dev \
+        libtiff5-dev \
+        libv4l-dev \
+        libvorbis-dev \
+        libx264-dev \
+        libxi-dev \
+        libxine2-dev \
+        libxmu-dev \
+        libxvidcore-dev \
+        libzmq3-dev \
+        v4l-utils \
+        x11-apps \
+        x264 \
+        yasm \
+        gfortran \
+        libatlas-base-dev \
+        libopenblas-dev \
+        liblapack-dev \
+        libblas-dev \
+        libev-dev \
+        libevdev2 \
+        libgeos-dev \
+        libssl-dev \
+        python3-pip \
+        libtesseract-dev \
+        libleptonica-dev \
+        liblog4cplus-dev \
+        libcurl3-dev \
+        libleptonica-dev \
+        libcurl4-openssl-dev \
+        liblog4cplus-dev \
+        time \
+        ## Python
+        python3-dev \
+        python3-numpy \
     && apt-get clean
 
 # Download & Build OpenCV in same RUN
 # OpenCV with cuDNN - cuDNN is supplied by the nvidia cuda container
-RUN set -x && mkdir /config &&\
-    apt-get install -y time &&\
-    cd /opt/ &&\
-    # Download and unzip OpenCV and opencv_contrib and delete zip files
-    wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip &&\
-    unzip ${OPENCV_VERSION}.zip &&\
-    rm ${OPENCV_VERSION}.zip &&\
-    wget https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip &&\
-    unzip ${OPENCV_VERSION}.zip &&\
-    rm ${OPENCV_VERSION}.zip &&\
-    # Create build folder and switch to it
-    mkdir -p /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build &&\
-    time cmake \
-    -DBUILD_DOCS=OFF \
-    -DBUILD_EXAMPLES=OFF \
-    -DBUILD_PERF_TESTS=OFF \
-    -DBUILD_TESTS=OFF \
-    -DBUILD_opencv_python2=OFF \
-    -DBUILD_opencv_python3=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr/local/ \
-    -DCMAKE_INSTALL_TYPE=Release \
-    -DFORCE_VTK=ON \
-    -DINSTALL_C_EXAMPLES=OFF \
-    -DINSTALL_PYTHON_EXAMPLES=OFF \
-    -DOPENCV_GENERATE_PKGCONFIG=ON \
-    -DWITH_CSTRIPES=ON \
-    -DWITH_EIGEN=ON \
-    -DWITH_GDAL=ON \
-    -DWITH_GSTREAMER=ON \
-    -DWITH_GSTREAMER_0_10=OFF \
-    -DWITH_GTK=ON \
-    -DWITH_IPP=ON \
-    -DWITH_OPENCL=ON \
-    -DWITH_OPENMP=ON \
-    -DWITH_TBB=ON \
-    -DWITH_V4L=ON \
-    -DWITH_WEBP=ON \
-    -DWITH_XINE=ON \
-    -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
-    -DOPENCV_ENABLE_NONFREE=ON \
-    -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN} \
-    -DWITH_CUDA=ON \
-    -DWITH_CUDNN=ON \
-    -DOPENCV_DNN_CUDA=ON \
-    -DENABLE_FAST_MATH=1 \
-    -DCUDA_FAST_MATH=1 \
-    -DWITH_CUBLAS=1 \
-    -DHAVE_opencv_python3=ON \
-    -DHAVE_opencv_python2=OFF \
-    -DPYTHON_EXECUTABLE=/usr/bin/python3 \
-    .. \
+RUN set -x \
+    && mkdir /config \
+    && cd /opt/ \
+    && wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
+    && unzip ${OPENCV_VERSION}.zip \
+    && rm ${OPENCV_VERSION}.zip \
+    && wget https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip \
+    && unzip ${OPENCV_VERSION}.zip \
+    && rm ${OPENCV_VERSION}.zip \
+    && mkdir -p /opt/opencv-${OPENCV_VERSION}/build \
+    && cd /opt/opencv-${OPENCV_VERSION}/build \
+    && time cmake \
+        -DBUILD_DOCS=OFF \
+        -DBUILD_EXAMPLES=OFF \
+        -DBUILD_PERF_TESTS=OFF \
+        -DBUILD_TESTS=OFF \
+        -DBUILD_opencv_python2=OFF \
+        -DBUILD_opencv_python3=ON \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local/ \
+        -DCMAKE_INSTALL_TYPE=Release \
+        -DFORCE_VTK=ON \
+        -DINSTALL_C_EXAMPLES=OFF \
+        -DINSTALL_PYTHON_EXAMPLES=OFF \
+        -DOPENCV_GENERATE_PKGCONFIG=ON \
+        -DWITH_CSTRIPES=ON \
+        -DWITH_EIGEN=ON \
+        -DWITH_GDAL=ON \
+        -DWITH_GSTREAMER=ON \
+        -DWITH_GSTREAMER_0_10=OFF \
+        -DWITH_GTK=ON \
+        -DWITH_IPP=ON \
+        -DWITH_OPENCL=ON \
+        -DWITH_OPENMP=ON \
+        -DWITH_TBB=ON \
+        -DWITH_V4L=ON \
+        -DWITH_WEBP=ON \
+        -DWITH_XINE=ON \
+        -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
+        -DOPENCV_ENABLE_NONFREE=ON \
+        -DCUDA_ARCH_BIN=${CUDA_ARCH_BIN} \
+        -DWITH_CUDA=ON \
+        -DWITH_CUDNN=ON \
+        -DOPENCV_DNN_CUDA=ON \
+        -DENABLE_FAST_MATH=1 \
+        -DCUDA_FAST_MATH=1 \
+        -DWITH_CUBLAS=1 \
+        -DHAVE_opencv_python3=ON \
+        -DHAVE_opencv_python2=OFF \
+        -DPYTHON_EXECUTABLE=/usr/bin/python3 \
+        .. \
   && time make -j${nproc} install \
   && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' \
-  && ldconfig
-    # Remove OpenCV sources and build folder
-RUN  set -x && cd / && rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
+  && ldconfig \
+  && cd / \
+  && rm -rf /opt/opencv-${OPENCV_VERSION} \
+  && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
+
 
 # Install coral usb libraries
-RUN 	set -x && echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
-            tee /etc/apt/sources.list.d/coral-edgetpu.list && \
-		curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-		apt-get update && apt-get -y install gasket-dkms libedgetpu1-std python3-pycoral &&\
-        apt clean
+RUN set -x \
+    && echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | \
+                  tee /etc/apt/sources.list.d/coral-edgetpu.list \
+	&& curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+	&& apt-get update \
+	&& apt-get -y install \
+	    gasket-dkms \
+	    libedgetpu1-std \
+	    python3-pycoral \
+    && apt clean
 
 # ALPR with GPU
 # Install prerequisites
 # this includes all the ones missing from OpenALPR's guide.
-RUN   set -x && \
-      apt-get -y install python3-pip libtesseract-dev libleptonica-dev liblog4cplus-dev \
-      libcurl3-dev libleptonica-dev libcurl4-openssl-dev liblog4cplus-dev && \
 # Clone the repo, copy config and enable gpu detections in config
-      cd /opt && git clone https://github.com/openalpr/openalpr.git && cd /opt/openalpr/src && mkdir build && cd build \
-      && cp /opt/openalpr/config/openalpr.conf.defaults /config/alpr.conf && \
-       sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf
+RUN   set -x \
+      && cd /opt \
+      && git clone https://github.com/openalpr/openalpr.git \
+      && cd /opt/openalpr/src \
+      && mkdir build \
+      && cd build \
+      && cp /opt/openalpr/config/openalpr.conf.defaults /config/alpr.conf \
+      && sed -i 's/detector = lbpcpu/detector = lbpgpu/g' /config/alpr.conf
 
 # setup the compile environment and compile
-RUN   set -x && cd /opt/openalpr/src/build && cmake \
-      -DCMAKE_INSTALL_PREFIX:PATH=/usr \
-      -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc \
-      -DCOMPILE_GPU=1 \
-       -DWITH_GPU_DETECTOR=ON \
-       .. && \
-      make -j"$(nproc)" && make install && \
-      cp /config/alpr.conf /etc/openalpr/ && rm -rf /opt/openalpr
+RUN   set -x \
+      && cd /opt/openalpr/src/build \
+      && cmake \
+          -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+          -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc \
+          -DCOMPILE_GPU=1 \
+           -DWITH_GPU_DETECTOR=ON \
+           .. \
+      && make -j"$(nproc)" \
+      && make install \
+      && cp /config/alpr.conf /etc/openalpr/ \
+      && rm -rf /opt/openalpr
 
 # Make sure face_recognition and DLib are installed
-RUN   set -x && python3 -m pip install face_recognition
+RUN   set -x \
+      && python3 -m pip install face_recognition
 
-## Create www-data user
+## Create www-data user, add to plugdev group in case of TPU perms issuea
 RUN set -x \
     && groupmod -o -g 911 www-data \
     && usermod -o -u 911 www-data \
     && usermod -aG plugdev www-data
 
-# neo-pyzm
-RUN   set -x && \
-      python3 -m pip install git+https://github.com/baudneo/pyzm.git && \
-      mkdir /mlapi && cd /mlapi && git clone https://github.com/baudneo/mlapi.git . && \
-      git checkout ${MLAPI_VERSION} && \
-      python3 -m pip install -r ./requirements.txt && \
-      mkdir -p /config/models && \
-      cp /mlapi/mlapi_dbuser.py /config && \
-      cp /mlapi/mlapi_face_train.py /config && \
-      cp /mlapi/get_encryption_key.py /config && \
-      cp -r /mlapi/images/ /config && \
-      cp -r /mlapi/known_faces/ /config && \
-      cp -r /mlapi/unknown_faces/ /config && \
-      cp -r /mlapi/tools/ /config && \
-      cp -r /mlapi/logs/ /config && \
-      cp -r /mlapi/db/ /config && \
-      cp -r /mlapi/examples/ /config && \
-      cp -r /mlapi/tools/ /config && \
-      cp /mlapi/get_models.sh /config && \
-      cp /mlapi/mlapiconfig.yml /config && \
-      cp /mlapi/mlapisecrets.yml /config
+# Install neo-pyzm first and then mlapi. /mlapi will have the repo. \
+#   mlapi.py is ran from /mlapi but all the configs are in /config
+RUN   set -x \
+      && python3 -m pip install git+https://github.com/baudneo/pyzm.git \
+      && mkdir /mlapi \
+      && cd /mlapi \
+      && git clone https://github.com/baudneo/mlapi.git . \
+      && git checkout ${MLAPI_VERSION} \
+      && python3 -m pip install -r ./requirements.txt \
+      && mkdir -p /config/models \
+      && cp /mlapi/mlapi_dbuser.py /config \
+      && cp /mlapi/mlapi_face_train.py /config \
+      && cp /mlapi/get_encryption_key.py /config \
+      && cp -r /mlapi/images/ /config \
+      && cp -r /mlapi/known_faces/ /config \
+      && cp -r /mlapi/unknown_faces/ /config \
+      && cp -r /mlapi/tools/ /config \
+      && cp -r /mlapi/logs/ /config \
+      && cp -r /mlapi/db/ /config \
+      && cp -r /mlapi/examples/ /config \
+      && cp -r /mlapi/tools/ /config \
+      && cp /mlapi/get_models.sh /config \
+      && cp /mlapi/mlapiconfig.yml /config \
+      && cp /mlapi/mlapisecrets.yml /config
 
 RUN set -x \
     && mkdir -p \
@@ -310,12 +340,12 @@ RUN set -x \
 # download ML models
 RUN set -x \
     && cd /config \
-    && chmod +x /config/get_models.sh \
-    && TARGET_DIR=/config/models \
-    INSTALL_YOLOV3=yes \
-    INSTALL_YOLOV4=yes \
-    INSTALL_CORAL_EDGETPU=yes \
-    /config/get_models.sh
+    && chmod +x "/config/*.sh" \
+    &&  TARGET_DIR=/config/models \
+        INSTALL_YOLOV3=yes \
+        INSTALL_YOLOV4=yes \
+        INSTALL_CORAL_EDGETPU=yes \
+        /config/get_models.sh
 # Install s6 overlay
 COPY --from=s6downloader /s6downloader /
 # Copy rootfs
@@ -326,15 +356,19 @@ ENV \
     S6_FIX_ATTRS_HIDDEN=1 \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
     SOCKLOG_TIMESTAMP_FORMAT="" \
-    MAX_LOG_SIZE_BYTES=10000000 \
+    MAX_LOG_SIZE_BYTES=50000000 \
     MAX_LOG_NUMBER=10
 
 # User default variables
-ENV     \
-        PUID=911\
-        PGID=911\
-        TZ="America/Chicago"\
-        USE_SECURE_RANDOM_ORG=1
+ENV \
+    PUID=911\
+    PGID=911\
+    TZ="America/Chicago"\
+    USE_SECURE_RANDOM_ORG=1\
+    MLAPI_CONTAINER=mlapi\
+    MLAPIDB_USER=mlapi_user\
+    MLAPIDB_PASS=ZoneMinder\
+    MLAPI_DEBUG_ENABLED=1
 
 EXPOSE 5000/tcp
 
