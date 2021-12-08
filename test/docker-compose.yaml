@@ -8,7 +8,7 @@ services:
     container_name: mlapi
     restart: always
     ports:
-      - 5000:5000
+      - "5000:5000"
     networks:
       - zoneminder
     volumes:
@@ -30,16 +30,16 @@ services:
       - ../.env
 
   zoneminder:
-    image: ghcr.io/baudneo/eventserver-base:latest
+    image: ghcr.io/baudneo/eventserver-mlapi:testing
     container_name: zoneminder
     restart: always
     stop_grace_period: 45s
     depends_on:
       - db
     ports:
-      - 80:80
-      - 443:443
-      - 9000:9000
+      - "80:80"
+      - "443:443"
+      - "9000:9000"
     networks:
       - zoneminder
     volumes:
@@ -52,7 +52,8 @@ services:
           size: 1000000000
     env_file:
       - ../.env
-#    environment:
+    environment:
+      - PYZM_CONF=/config
 #      - ZM_SERVER_HOST=zoneminder1
 
 

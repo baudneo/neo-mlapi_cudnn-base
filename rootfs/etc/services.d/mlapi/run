@@ -7,17 +7,14 @@
 # ==============================================================================
 
 
-MLAPI_FLAGS="--config /config/mlapiconfig.yml"
+MLAPI_FLAGS=(--config /config/mlapiconfig.yml --from-docker)
 
 if [ "${MLAPI_DEBUG_ENABLED}" -eq 1 ]; then
   echo "Enabling MLAPI Debug!" | info
-  MLAPI_FLAGS="${MLAPI_FLAGS} --debug"
+  MLAPI_FLAGS+=("--debug")
 fi
 
 echo "Starting Neo MLAPI..." | info
-s6-setuidgid www-data python3 /mlapi/mlapi.py \
-    ${MLAPI_FLAGS}
-
-echo "Neo MLAPI is up! Proceeding to monitoring." | info
+s6-setuidgid www-data python3 /mlapi/mlapi.py "${MLAPI_FLAGS[@]}"
 # Notify s6 service is up
 fdmove 1 3 printf "done\n"

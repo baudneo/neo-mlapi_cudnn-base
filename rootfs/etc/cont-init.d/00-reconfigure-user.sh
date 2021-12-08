@@ -34,5 +34,5 @@ fi
 echo "Setting permissions for user nobody at /log" | info "[${program_name}] "
 chown -R nobody:nogroup \
   /log
-chmod -R 755 \
+chmod -R 765 \
   /log
