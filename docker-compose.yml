@@ -21,8 +21,7 @@ services:
       - /dev/bus/usb:/dev/bus/usb
 #      You can upgrade mlapi by replacing mlapi.py with a newer version. mlapi.py is the only file inside
 #      the containers /mlapi dir. Make sure you place a current or newer mlapi.py inside of ./mlapi/upgrade
-      - ./mlapi/upgrade:/mlapi
-
+#      - ./mlapi/upgrade:/mlapi
 # ADVANCED! To enable upgrading neo-pyzm, it takes a bit more work. Find the neo-pyzm folder in the python library.
 # using docker exec -it <container name> /usr/bin/bash (or /bin/bash) and look around for the /usr/local/lib/python3.X/dist-packages/neo-pyzm* folder.
 # Clone the new Neo pyzm repo and copy the nested pyzm folder in a volume mapped to where pyzm is installed so the file structure matches, pyzm is now upgraded to the latest release/commit..
@@ -37,7 +36,7 @@ services:
               count: 1
               capabilities: [ gpu, compute, utility ]
     environment:
-      - - PYZM_CONF=/config
+      - PYZM_CONF=/config
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
 
@@ -63,9 +62,9 @@ services:
     depends_on:
       - db
     ports:
-      - 80:80
-      - 443:443
-      - 9000:9000
+      - "80:80"
+      - "443:443"
+      - "9000:9000"
     networks:
       - zoneminder
     volumes:
