@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ghcr.io/baudneo/mlapi_cudnn-base:latest
+    - name: docker-bpgpr
+      # You may pin to the exact commit or the version.
+      # uses: zvfvrv/docker-bpgpr@53180efa7b1830d5939f524cb587e5aad425873d
+      uses: zvfvrv/docker-bpgpr@v1.0.2
+      with:
+        # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+        gh_token: ${{ secrets.GITHUB_TOKEN }}
+        # Image name
+        image_name: ghcr.io/baudneo/mlapi_cudnn-base
+        # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
+        tags: latest,amd64
