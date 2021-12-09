@@ -1,29 +1,44 @@
 # Neo-MLAPI with GPU / TPU
-
-![Status](https://img.shields.io/badge/Status-ALPHA-red)
-
-Inspiration came from [zoneminder-containers](https://github.com/zoneminder-containers) repo and their work. I am extending the functionality for Neo-ZMES.
+![Status](https://img.shields.io/badge/Status-BETA-orange)
+#Learning
+I am learning most of these workflows, Git, CI/CD and best practices as I go, no formal training. Please forgive the mess.
+# Inspiration
+[zoneminder-containers](https://github.com/zoneminder-containers) repo and [data machines](https://github.com/baudneo/cuda_tensorflow_opencv).
 
 # Has
-- CUDA 11.4 + cuDNN 8 (Confirmed working - See Gotcha section for LXC info)
-- Face recognition (Confirmed working)
-- ALPR binary with GPU support (In final testing stage)
-- Coral USB TPU libs (Confirmed working - see Gotcha section for LXC info)
-- OpenCV 4.5.4 with cuDNN [YOLOv4] (Confirmed working)
-# Why
-This is an automatically updating [Neo MLAPI](https://github.com/baudneo/mlapi) container built using s6-overlay with full support for all things containers.
-CUDA and cuDNN Ubuntu 20.04 image used to enable GPU support (nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04). 
-Coral AI USB TPU supported as well.
+- CUDA 11.4 + cuDNN 8 [Compiled with Compute Capability - 6.0, 6.1, 7.0, 7.5, 8.0, 8.6] (See Gotcha section for LXC info)
+- DLib 19.x with face recognition libs
+- ALPR via Cloud and local openALPR binary [GPU support] (In final testing stage)
+- Coral USB TPU libs for Object and Face detection. [May be upgraded to a full TF2 - Pytorch workflow] (see Gotcha section for LXC info)
+- OpenCV 4.5.4 with cuDNN [HOG, YOLO v3/4, TinyYOLO v3/4] (Confirmed working)
 
-If you opt to build the image yourself it may take a long time as it compiles OpenCV, DLib and ALPR with GPU support.
+# Why
+[Neo MLAPI](https://github.com/baudneo/mlapi) has quite the installation if you are building from scratch and wanting to use a GPU.
+You need to compile OpenCV with CUDA/cuDNN support to run YOLO, DLib for the face recognition libs and compile 
+openALPR with GPU support. If you wish to use a USB TPU as well, then you need to set that all up.
+This container aims to be a one and done solution for these requirements.
+
+Setup neo-eventserver-mlapi-base which houses ZoneMinder and a Neo ZMES instance configured to communicate with this image.
+Configure a few things if starting from scratch, or move over your existing config, secrets, user DB (db.json) and faces.dat
+ from an existing Neo MLAPI instance.
+
+This container is built using s6-overlay with full support for all things containers.
+ Based on nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04 image as a base. 
+
+If you opt to build the image yourself it may take a long time as it compiles OpenCV, DLib and ALPR with GPU support. 
+OpenCV is compiled using 6x CUDA_ARCH_BIN, so it takes awhile to compile. OpenCV with all of those Compute 
+Capabilities compiled for should allow most consumer GPU' to run detections without issue.
 
 This container aims to follow all the best practices of being a container meaning that the software and persistent
 data are separated, with the container remaining static. This means the container can easily be updated/restored provided
-the persistent data volumes are backed up. 
+the persistent data volumes are backed up. For advanced users, there is a procedure to mount an upgraded version of 
+Neo PYZM and/or Neo MLAPI, OpenCV libs won't change much, if at all. This allows for upgrading without rebuilding the 
+detection libs.
 
 Not only does this aim to follow all the best practices, but this also aims to be
 the easiest container with nearly everything configurable through environment variables
-or automatically/preconfigured for you!
+or automatically/preconfigured for you! I am actively developing Neo ZMES/PYZM/MLAPI so integrations with Docker will 
+be stream lined.
 
 
 # How
@@ -31,10 +46,11 @@ or automatically/preconfigured for you!
 1. Install [Docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/)
 2. Install [Docker Nvidia Toolkit](https://github.com/NVIDIA/nvidia-docker) - REQUIRED to use GPU
 3. You must have NVIDIA GPU drivers installed on the host (compatible with CUDA 11.4+ - NOTE: you do not need CUDA installed on host)
-4. Download docker-compose.yml
-5. Download .env
-6. Place all these files in the same folder and configure .env and the yml files as you please.
-7. Run `docker-compose up -d` to start.
+4. For TPU, you may need to download the libs on the docker host (YMMV)
+5. Download docker-compose.yml
+6. Download .env
+7. Place all these files in the same folder and configure .env and the yml files as you please.
+8. Run `docker-compose up -d` to start.
 
 # Gotchas
 1. If you are using a TPU:

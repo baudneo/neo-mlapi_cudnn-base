@@ -2,10 +2,10 @@ version: '3.6'
 
 services:
   mlapi:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-#    image: ghcr.io/baudneo/mlapi_cudnn-base:latest
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+    image: ghcr.io/baudneo/mlapi_cudnn-base:latest
     container_name: mlapi
     restart: always
     # Need privileged for USB TPU access, comment out if not using TPU
@@ -55,8 +55,7 @@ services:
 
   zoneminder:
     container_name: zoneminder
-#    image: ghcr.io/baudneo/eventserver-mlapi:latest
-    image: eventserver-mlapi:latest
+    image: ghcr.io/baudneo/eventserver-mlapi:latest
     restart: always
     stop_grace_period: 45s
     depends_on:
@@ -77,7 +76,8 @@ services:
           size: 1000000000
     env_file:
       - ./.env
-#    environment:
+    environment:
+      - PYZM_CONF=/config
 #      - ZM_SERVER_HOST=zoneminder1
 
 
