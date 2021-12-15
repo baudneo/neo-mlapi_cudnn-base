@@ -4,16 +4,16 @@
 program_name="mlapi-config"
 create(){
   # $1 = 'file' or 'dir'
-  # $2 = 'SOURCE path'
-  # $3 = 'DESTINATION path' - chekcs if the destination exists, if not it copies SOURCE to DESTINATION
+  # $2 = 'SOURCE'
+  # $3 = 'DESTINATION' - checks if the DESTINATION exists, if not it copies SOURCE to DESTINATION
   if [ "${1}" == 'file' ]; then
     if [ ! -f "${3}" ]; then
-      echo "Creating ${3}" | init "[${program_name}] "
+      echo "Creating File: ${3}" | init "[${program_name}] "
       s6-setuidgid www-data cp "${2}" "${3}"
     fi
   elif [ "${1}" == 'dir' ]; then
     if [ ! -d "${3}" ]; then
-      echo "Creating ${3}" | init "[${program_name}] "
+      echo "Creating Directory: ${3}" | init "[${program_name}] "
       s6-setuidgid www-data cp -r "${2}" "${3}"
     fi
   else
@@ -23,7 +23,7 @@ create(){
 
 [[ ! -f /config/mlapiconfig.yml ]] && echo "Creating Neo MLAPI configuration file" | init "[${program_name}] "
 [[ ! -f /mlapi/mlapi.py ]] && echo "Creating Neo MLAPI' MAIN mlapi.py file from cache - If you want \
-to upgrade you must mount the containers /mlapi as a volume and place a newer mlapi.py inside. The final absolute \
+to upgrade you must mount this containers /mlapi as a volume and place a newer mlapi.py inside. The final absolute \
 path has to be /mlapi/mlapi.py " | init "[${program_name}] "
 create 'file' '/mlapi_default/mlapiconfig.yml' '/config/mlapiconfig.yml'
 create 'file' '/mlapi_default/mlapisecrets.yml' '/config/mlapisecrets.yml'
@@ -42,7 +42,7 @@ chown -R www-data:www-data /config
 
 # ML models
 if [ ! -f /config/models/coral_edgetpu/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite ]; then
-  echo "Grabbing ML models ([Tiny] YOLOv3, [Tiny] YOLOv4, coral TPU models)" | init "[${program_name}] "
+  echo "Grabbing ML models from local cache ([Tiny] YOLOv3, [Tiny] YOLOv4, coral TPU models)" | init "[${program_name}] "
   s6-setuidgid www-data cp -r /mlapi_defaults/models /config
 fi
 ## Configure MLAPI
@@ -51,20 +51,19 @@ sed -i "s|#\?base_data_path:.*|base_data_path: /config|" /config/mlapiconfig.yml
 sed -i "s|#\?wsgi_server:.*|wsgi_server: bjoern|" /config/mlapiconfig.yml
 sed -i "s|#\?log_user:.*|log_user: www-data|" /config/mlapiconfig.yml
 sed -i "s|#\?log_group:.*|log_group: www-data|" /config/mlapiconfig.yml
-# Always syslog
-sed -i "s|#\?log_level_syslog:.*|log_level_syslog: 5|" /config/mlapiconfig.yml
+#sed -i "s|#\?log_level_syslog:.*|log_level_syslog: 5|" /config/mlapiconfig.yml
 
 if [ "$MLAPI_DEBUG_ENABLED" -eq 1 ]; then
   echo "Enabling debug logs in 'pyzm_overrides'" | info "[${program_name}] "
   sed -i "s|#\?log_debug:.*|log_debug: True|" /config/mlapiconfig.yml
-  sed -i "s|#\?log_debug_target:.*|log_debug_target: _zm_mlapi|" /config/mlapiconfig.yml
+  sed -i "s|#\?dump_console:.*|dump_console: True|" /config/mlapiconfig.yml
   sed -i "s|#\?log_level_debug:.*|log_level_debug: 5|" /config/mlapiconfig.yml
 elif [ "$MLAPI_DEBUG_ENABLED" -eq 0 ]; then
   sed -i "s|#\?log_debug:.*|log_debug: False|" /config/mlapiconfig.yml
-  sed -i "s|#\?log_debug_target:.*|log_debug_target: ''|" /config/mlapiconfig.yml
   sed -i "s|#\?log_level_debug:.*|log_level_debug: 0|" /config/mlapiconfig.yml
+ # sed -i "s|#\?dump_console:.*|dump_console: False|" /config/mlapiconfig.yml
 fi
-# Always have file logging off
+# todo: figure out how to get s6 logger to accept mlapi.py. only mlapi.py has this issue of needing syslog.
 sed -i "s|#\?log_debug_file:.*|log_debug_file: -5|" /config/mlapiconfig.yml
 sed -i "s|#\?log_level_file:.*|log_level_file: -5|" /config/mlapiconfig.yml
 

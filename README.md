@@ -1,9 +1,11 @@
 # Neo-MLAPI with GPU / TPU
 ![Status](https://img.shields.io/badge/Status-BETA-orange)
-#Learning
+# Learning
 I am learning most of these workflows, Git, CI/CD and best practices as I go, no formal training. Please forgive the mess.
-# Inspiration
+## Inspiration
 [zoneminder-containers](https://github.com/zoneminder-containers) repo and [data machines](https://github.com/baudneo/cuda_tensorflow_opencv).
+## Guided walkthrough
+[Article](https://medium.com/@baudneo/install-neo-mlapi-docker-image-9b8786488528) here.
 
 # Has
 - CUDA 11.4 + cuDNN 8 [Compiled with Compute Capability - 6.0, 6.1, 7.0, 7.5, 8.0, 8.6] (See Gotcha section for LXC info)
