@@ -2,10 +2,11 @@ version: '3.6'
 
 services:
   mlapi:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-#    image: ghcr.io/baudneo/mlapi_cudnn-base:latest
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+    image: ghcr.io/baudneo/mlapi_cudnn-base:0.0.3
+#    image: mlapi_new:testing
     container_name: mlapi
     restart: always
     # Need privileged for USB TPU access, comment out if not using TPU
@@ -14,9 +15,13 @@ services:
       - "5000:5000"
     networks:
       - zoneminder
+    extra_hosts:
+      - "zm.baudneo.com:10.0.0.30"
     volumes:
       - ./mlapi/config:/config
       - ./mlapi/log:/log
+#      - ./mlapi/mlapi.py:/mlapi/mlapi.py
+#      - ./pyzm:/usr/local/lib/python3.8/dist-packages/pyzm/
       # TPU access (mount the whole USB system)
       - /dev/bus/usb:/dev/bus/usb
 #      You can upgrade mlapi by replacing mlapi.py with a newer version. mlapi.py is the only file inside
@@ -35,50 +40,6 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu, compute, utility ]
-    environment:
-      - PYZM_CONF=/config
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
-
-  db:
-    container_name: db
-    image: mariadb
-    restart: always
-    networks:
-      - zoneminder
-    volumes:
-      - ./zm/db:/var/lib/mysql
-    environment:
-      - MYSQL_DATABASE=zm
-    env_file:
-      - ./.env
-
-  zoneminder:
-    container_name: zoneminder
-#    image: ghcr.io/baudneo/eventserver-mlapi:latest
-    image: eventserver-mlapi:latest
-    restart: always
-    stop_grace_period: 45s
-    depends_on:
-      - db
-    ports:
-      - "80:80"
-      - "443:443"
-      - "9000:9000"
-    networks:
-      - zoneminder
-    volumes:
-      - ./zm/data:/data
-      - ./zm/config:/config
-      - ./zm/log:/log
-      - type: tmpfs
-        target: /dev/shm
-        tmpfs:
-          size: 1000000000
-    env_file:
-      - ./.env
-#    environment:
-#      - ZM_SERVER_HOST=zoneminder1
 
 
 

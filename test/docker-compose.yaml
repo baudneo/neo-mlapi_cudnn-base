@@ -30,7 +30,7 @@ services:
       - ../.env
 
   zoneminder:
-    image: ghcr.io/baudneo/eventserver-mlapi:testing
+    image: ghcr.io/baudneo/eventserver-mlapi:latest
     container_name: zoneminder
     restart: always
     stop_grace_period: 45s
